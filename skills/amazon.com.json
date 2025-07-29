@@ -1,0 +1,68 @@
+{
+    "domain": "amazon.com",
+    "skills": [
+      {
+        "name": "search_products",
+        "description": "Search Amazon for a product name and return the list items (title, price, link).",
+        "input":  { "query": "string" },
+        "output": "results",
+        "steps": [
+          { "action": "wait_for_selector", "selector": "#twotabsearchtextbox" },
+          { "action": "click",              "selector": "#twotabsearchtextbox" },
+          { "action": "type",               "selector": "#twotabsearchtextbox", "input_key": "query" },
+          { "action": "press_enter" },
+          { "action": "wait_for_selector",  "selector": "div.s-search-results" },
+          {
+            "action":     "extract_list",
+            "selector":   "div[data-component-type='s-search-result']",
+            "output_key": "results"
+          }
+        ]
+      },
+      {
+        "name": "open_result_by_index",
+        "description": "Open the N-th search result from the current results page.",
+        "input":  { "index": "number" },
+        "output": "product_url",
+        "steps": [
+          { "action": "wait_for_selector", "selector": "div[data-component-type='s-search-result']" },
+          {
+            "action":   "click_element_by_index",
+            "selector": "div[data-component-type='s-search-result'] h2 a",
+            "index":     0
+          },
+          { "action": "wait_for_selector", "selector": "#productTitle" },
+          { "action": "extract_fields",    "selector": "html", "output_key": "product_url" }
+        ]
+      },
+      {
+        "name": "extract_product_details",
+        "description": "On a product page, capture title, price & rating (no cart action).",
+        "output": "product_details",
+        "steps": [
+          { "action": "wait_for_selector", "selector": "#productTitle" },
+          {
+            "action":     "extract_fields",
+            "selector":   "#productTitle, #priceblock_ourprice, #price_inside_buybox, #acrPopover",
+            "output_key": "product_details"
+          }
+        ]
+      },
+      {
+        "name": "add_current_product_to_cart",
+        "description": "Click “Add to Cart” on the current product page and return cart count.",
+        "output": "cart_status",
+        "steps": [
+          { "action": "wait_for_selector", "selector": "#add-to-cart-button" },
+          { "action": "click",             "selector": "#add-to-cart-button" },
+          { "action": "wait_for_selector", "selector": "#nav-cart-count" },
+          {
+            "action":     "extract_fields",
+            "selector":   "#nav-cart-count",
+            "output_key": "cart_status"
+          }
+        ]
+      }
+    ]
+  }
+  
